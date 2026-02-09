@@ -11,9 +11,21 @@ WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 reps = 0
-
+timer = None
 
 # ---------------------------- TIMER RESET ------------------------------- # 
+def reset_timer():
+    window.after_cancel(timer)
+    #timer_text 00:00
+    canvas.itemconfig(timer_text, text="00:00")
+    #title_label "Timer"
+    timer_label.config(text="Timer", fg=GREEN)
+    #reset check_marks
+    check_label.config(text="")
+
+    global reps
+    reps = 0
+
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
@@ -38,9 +50,9 @@ def start_timer():
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 def count_down(count):
+    global cheks
     count_min = math.floor(count / 60)
     count_seg = count % 60
-
 
     if count_seg < 10:
         count_seg = f"0{count_seg}"
@@ -48,9 +60,15 @@ def count_down(count):
 
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_seg}")
     if count > 0:
-        window.after(1000, count_down, count - 1)
+        global timer
+        timer = window.after(1000, count_down, count - 1)
     else:
         start_timer()
+        marks = ""
+        work_sessions = math.floor(reps/2)
+        for _ in range(work_sessions):
+            marks += "✔"
+        check_label.config(text=marks)
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
@@ -74,11 +92,11 @@ start_button.grid(column=0, row=2)
 
 #Create a Check Label
 
-check_label = Label(text="✔", fg=GREEN, bg=YELLOW, font=("normal", 15))
+check_label = Label(fg=GREEN, bg=YELLOW, font=("normal", 15))
 check_label.grid(column=1, row=3)
 
 # Create Reset Button
-reset_button = Button(text="Reset", font=(FONT_NAME, 10, "bold"))
+reset_button = Button(text="Reset", font=(FONT_NAME, 10, "bold"), command=reset_timer)
 reset_button.grid(column=2, row=2)
 
 
